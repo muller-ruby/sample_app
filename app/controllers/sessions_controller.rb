@@ -16,7 +16,7 @@ class SessionsController < ApplicationController
       # paramsハッシュ値を調べれば、送信された値に基づいてユーザーを記憶したり、
       # 忘れたりできるようになる。（三項演算子：if-thenの分岐構造）
       params[:session][:remember_me] == '1' ? remember(user) : forget(user)
-      redirect_to user
+      redirect_back_or user
     else
       flash.now[:danger] = 'Invalid email/password combination'
       #　エラーメッセージを作成する
