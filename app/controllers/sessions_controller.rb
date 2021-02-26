@@ -1,4 +1,5 @@
 class SessionsController < ApplicationController
+  
   def new
   end
   
@@ -7,16 +8,24 @@ class SessionsController < ApplicationController
     user = User.find_by(email: params[:session][:email].downcase)
      #　authenticateメソッドは認証に失敗した時にfalseを返す(6.3.4)
     if user && user.authenticate(params[:session][:password])
-      #　ユーザーログイン後にユーザー情報のページにリダイレクトする
-      #　ヘルパーメソッドでlog_inを定義したので、以下の通りかける。
-      log_in user
-      # # model/user.rbのdef authenticated?(remember_token)実装の関連で
-      # #　ログインと連携させた（9.7）
-      # remember user
-      # paramsハッシュ値を調べれば、送信された値に基づいてユーザーを記憶したり、
-      # 忘れたりできるようになる。（三項演算子：if-thenの分岐構造）
-      params[:session][:remember_me] == '1' ? remember(user) : forget(user)
-      redirect_back_or user
+      # ユーザーが有効である場合にのみログインできるようにする。
+        if user.activated?
+        #　ユーザーログイン後にユーザー情報のページにリダイレクトする
+        #　ヘルパーメソッドでlog_inを定義したので、以下の通りかける。
+          log_in user
+          # # model/user.rbのdef authenticated?(remember_token)実装の関連で
+          # #　ログインと連携させた（9.7）
+          # remember user
+          # paramsハッシュ値を調べれば、送信された値に基づいてユーザーを記憶したり、
+          # 忘れたりできるようになる。（三項演算子：if-thenの分岐構造）
+          params[:session][:remember_me] == '1' ? remember(user) : forget(user)
+          redirect_back_or user
+        else
+          message = "Account not activated."
+          message += "Check your email for the activation link."
+          flash[:warning] = message
+          redirect_to root_url
+        end
     else
       flash.now[:danger] = 'Invalid email/password combination'
       #　エラーメッセージを作成する

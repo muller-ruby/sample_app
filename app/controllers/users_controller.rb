@@ -8,7 +8,7 @@ class UsersController < ApplicationController
   before_action :admin_user,     only: [:destroy]
   
   def index
-    @users = User.paginate(page: params[:page])
+    @users = User.where(activated: true).paginate(page: params[:page])
   end
   
   def show
@@ -23,13 +23,17 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     if @user.save
       #　保存の成功をここで扱う
-      log_in @user
-      # ユーザ登録が終わってからユーザーに手動ログインを促すと、
-      #　ユーザーに余分な手間を強いることになるので、ユーザー登録中
-      #　にログインするには、Usersコントローラーのcreateアクションにlog_in
-      # を追加する
-      flash[:success] = "Welcome to the Sample App!"
-      redirect_to @user
+      # log_in @user
+      # # ユーザ登録が終わってからユーザーに手動ログインを促すと、
+      # #　ユーザーに余分な手間を強いることになるので、ユーザー登録中
+      # #　にログインするには、Usersコントローラーのcreateアクションにlog_in
+      # # を追加する
+      # flash[:success] = "Welcome to the Sample App!"
+      # redirect_to @user
+      #UserMailer.account_activation(@user).deliver_now
+      @user.send_activation_email
+      flash[:info] = "Please check your email to activate your account."
+      redirect_to root_url
     else
       render 'new'
     end
