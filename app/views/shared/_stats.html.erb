@@ -1,0 +1,17 @@
+<!--# コラム8.1参照。@userがnilでない場合（つまりプロフィールページ）は何もせず-->
+<!--# nilの場合（つまりHomeページ）には@userにcurrent_userを代入するコード-->
+<% @user ||= current_user %>
+<div class="stats">
+  <a href="<%= following_user_path(@user) %>">
+    <strong id="following" class="stat" >
+      <%= @user.following.count %>
+      <p>following</p>
+    </strong>
+  </a>
+  <a href="<%= followers_user_path(@user) %>">
+    <strong id="followers" class="stat">
+      <%= @user.followers.count %>
+      <p>followers</p>
+    </strong>
+  </a>
+</div>
